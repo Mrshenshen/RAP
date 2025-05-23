@@ -3,12 +3,12 @@
 ## Introduction
 This is the source code of "Truth in the Few: High-Value Data Selection for Efficient Multi-Modal Reasoning"
 
-![Intro](fig\intro1.png)
+![Intro](fig/intro1.png)
 
 ## Truth in the Few: High-Value Data Selection for Efficient Multi-Modal Reasoning
 Our RAP model comprises three components: 1) Causal Discrepancy Estimator (CDE); 2) RAttention Confidence Estimator (ACE); and 3) Difficulty-aware Replacement Module (DRM).
 
-![Intro](fig\introduction.png)
+![Intro](fig/introduction.png)
 
 
 
