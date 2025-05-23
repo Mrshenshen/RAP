@@ -37,13 +37,10 @@ def calculate_accuracy(epoch_data, id_set):
             for id, (correct, total) in accuracies.items()}
 
 def process_accuracy_sequences(id_accuracies, max_epochs):
-    # Forward fill missing values
     for accuracy_sequence in id_accuracies.values():
         for i in range(len(accuracy_sequence)-1):
             if accuracy_sequence[i] == -1 and accuracy_sequence[i+1] != -1:
                 accuracy_sequence[i] = accuracy_sequence[i+1]
-    
-    # Filter valid sequences
     valid_sequences = [(id, sequence) 
                       for id, sequence in id_accuracies.items() 
                       if -1 not in sequence[:max_epochs]]
@@ -92,7 +89,6 @@ def main():
     print(baseline_sequence_image)
     print(baseline_sequence)
     diff = [a - b for a, b in zip(baseline_sequence_image, baseline_sequence)]
-    #difficult
     with open(args.image_json, 'r') as f:
         data = json.load(f)
     if not isinstance(data, list):
@@ -106,7 +102,6 @@ def main():
             easy_samples.append(extract_question(group[0]['onlyid']))
         elif count_reward==1:
             right1_samples.append(extract_question(group[0]['onlyid']))
-    # Calculate similarity scores
     id_scores = {
         id: (calculate_similarity_score(sequence, baseline_sequence_image),sequence)
         for id, sequence in zip(valid_ids_image, accuracy_sequences_image)
@@ -146,6 +141,5 @@ def main():
     filtered_df.to_parquet("./parquet/train-00000-of-00001.parquet", index=False)
     filtered_df.to_parquet("./parquet/test-00000-of-00001.parquet", index=False)
     filtered_df.to_parquet("./parquet/validation-00000-of-00001.parquet", index=False)
-###########
 if __name__ == "__main__":
     main()
