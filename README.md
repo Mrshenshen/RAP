@@ -82,7 +82,7 @@ Besides, you need to prepare the following checkpoints of base models:
 
 
 ## Evaluation
-We use [VLMEvalKit](https://github.com/open-compass/VLMEvalKit) to evaluate models.
+We recommend use [VLMEvalKit](https://github.com/open-compass/VLMEvalKit) to evaluate models.
 ```bash
 torchrun --nproc-per-node=8 run.py --data WeMath --model Qwen2.5-VL-7B-Instruct --verbose
 ```
