@@ -647,9 +647,9 @@ class RayPPOTrainer:
                         # we combine with rule-based rm
                         reward_tensor, reward_metrics = self.reward_fn(batch)
                         
-                        # ========== 新增：保存注意力分析所需数据 ========== #
+                        
                         sample_data = []
-                        attention_data = []  # 新增注意力数据收集
+                        attention_data = []
                         
                         for idx, sample in enumerate(batch):
                             prompt = self.tokenizer.batch_decode(gen_batch_output[idx].batch['prompts'], skip_special_tokens=True)
@@ -657,7 +657,7 @@ class RayPPOTrainer:
                             response = self.tokenizer.batch_decode(gen_batch_output[idx].batch['responses'], skip_special_tokens=True)
                             response = ''.join([item for item in response if item])
                             
-                            # 收集样本基础数据
+                            
                             sample_data.append({
                                 "onlyid": batch[idx].non_tensor_batch['onlyid'],
                                 "prompt": prompt,
@@ -668,13 +668,13 @@ class RayPPOTrainer:
                                 "response_length": len(response)
                             })
                             
-                            # 新增：收集注意力分析所需数据
+                            
                             attention_data.append({
                                 "onlyid": batch[idx].non_tensor_batch['onlyid'],
                                 "prompt_tokens": self.tokenizer.convert_ids_to_tokens(gen_batch_output[idx].batch['prompts'][0]),
                                 "response_tokens": self.tokenizer.convert_ids_to_tokens(gen_batch_output[idx].batch['responses'][0]),
                                 "token_level_scores": reward_tensor[idx].cpu().tolist(),
-                                "attention_weights": gen_batch_output[idx].batch.get('attention_weights', []),  # 假设模型返回了注意力权重
+                                "attention_weights": gen_batch_output[idx].batch.get('attention_weights', []),
                                 "generation_config": {
                                     "temperature": gen_batch.meta_info.get("temperature", 1.0),
                                     "top_p": gen_batch.meta_info.get("top_p", 1.0),
@@ -682,26 +682,23 @@ class RayPPOTrainer:
                                 }
                             })
                         
-                        # 保存路径设置
+                        
                         save_dir = os.path.join('/RAP/output/samples', "train")
                         save_dir_reward = os.path.join('/RAP/output/reward')
-                        save_dir_attention = os.path.join('/RAP/output/attention')  # 新增注意力数据保存路径
+                        save_dir_attention = os.path.join('/RAP/output/attention')
                         
                         os.makedirs(save_dir, exist_ok=True)
                         os.makedirs(save_dir_reward, exist_ok=True)
-                        os.makedirs(save_dir_attention, exist_ok=True)  # 创建注意力数据目录
-                        
-                        # 保存样本数据
+                        os.makedirs(save_dir_attention, exist_ok=True)
+                      
                         with open(os.path.join(save_dir, f"step_{self.global_step}.json"), 'w', encoding='utf-8') as f:
                             json.dump(sample_data, f, indent=4)
                         
-                        # 保存奖励数据
                         reward_tensor_numpy = reward_tensor.cpu().numpy()
                         np.save(os.path.join(save_dir_reward, f"step_{self.global_step}_reward_tensor.npy"), reward_tensor_numpy)
                         with open(os.path.join(save_dir_reward, f"step_{self.global_step}_reward_metrics.json"), "w") as f:
                             json.dump(reward_metrics, f, indent=4)
-                        
-                        # 新增：保存注意力数据
+                       
                         with open(os.path.join(save_dir_attention, f"step_{self.global_step}_attention.json"), 'w', encoding='utf-8') as f:
                             json.dump({
                                 "attention_data": attention_data,
